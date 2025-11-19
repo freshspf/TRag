@@ -1,0 +1,14 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:5-community  # 使用 Neo4j 5 社区版
+    container_name: my_neo4j
+    ports:
+      - "7474:7474"  # Web 界面
+      - "7687:7687"  # Bolt 驱动连接端口
+    environment:
+      - NEO4J_AUTH=neo4j/password123  # 设置用户名 neo4j，密码 password123
+    volumes:
+      - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/neo4j:/data
