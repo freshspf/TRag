@@ -1,24 +1,26 @@
 package com.spf.tbackend.controller;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/chat")
+@RequestMapping("/api/multi-chat")
 public class ChatController {
 
-    private final ChatClient chatClient;
+    @Autowired
+    @Qualifier("openAiChatClient")
+    private ChatClient openAiChatClient;
 
-    public ChatController(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
+
+    @GetMapping("/chat")
+    public String chat(String message) {
+        return openAiChatClient.prompt("you are gpt-4o-mini").user("Who are you")
+                .call().content();
     }
 
-    @GetMapping("/test")
-    public String completion(@RequestParam String message) {
-        return chatClient.prompt()
-                .user(message)
-                .call()
-                .content();
-    }
+
 }
