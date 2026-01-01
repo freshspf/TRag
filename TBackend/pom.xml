@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- 1) 主线锁定到稳定的 Boot 3.4.x（不要追 3.5.x/4.x） -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>3.4.5</version>
         <relativePath/>
     </parent>
 
@@ -13,22 +16,26 @@
     <artifactId>TBackend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>TBackend</name>
-    <description>Spring AI RAG Engine with DashScope Integration</description>
+    <description>Spring AI RAG Engine with DashScope Integration (GA frozen stack)</description>
 
     <properties>
         <java.version>17</java.version>
-        <spring-ai.version>1.1.0-M4</spring-ai.version>
-        <spring-ai-alibaba.version>1.1.0.0-M5</spring-ai-alibaba.version>
-        <spring-ai-alibaba-extensions.version>1.1.0.0-M5</spring-ai-alibaba-extensions.version>
+
+        <!-- 2) 主线只用 GA：Spring AI 1.0.0 + Spring AI Alibaba 1.0.0.4 -->
+        <spring-ai.version>1.0.0</spring-ai.version>
+        <spring-ai-alibaba.version>1.0.0.4</spring-ai-alibaba.version>
 
         <mybatis-plus.version>3.5.7</mybatis-plus.version>
         <hutool.version>5.8.26</hutool.version>
-
         <graalvm.polyglot.version>24.2.1</graalvm.polyglot.version>
+
+        <!-- 可选：统一 milvus 版本（你也可以保持现在写死的 2.4.0） -->
+        <milvus-sdk.version>2.4.0</milvus-sdk.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Spring AI BOM (GA) -->
             <dependency>
                 <groupId>org.springframework.ai</groupId>
                 <artifactId>spring-ai-bom</artifactId>
@@ -36,13 +43,8 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>com.alibaba.cloud.ai</groupId>
-                <artifactId>spring-ai-alibaba-extensions-bom</artifactId>
-                <version>${spring-ai-alibaba-extensions.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
+
+            <!-- Spring AI Alibaba BOM (GA line) -->
             <dependency>
                 <groupId>com.alibaba.cloud.ai</groupId>
                 <artifactId>spring-ai-alibaba-bom</artifactId>
@@ -71,25 +73,26 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!-- Spring AI Alibaba 集成 -->
+        <!-- Spring AI Alibaba：DashScope/Qwen（GA line） -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
             <artifactId>spring-ai-alibaba-starter-dashscope</artifactId>
         </dependency>
+
+        <!-- （可选但推荐）对话记忆 JDBC：有助于长周期开发与回放/评估 -->
+        <!-- 如果你还没用到，可先注释掉 -->
         <dependency>
             <groupId>com.alibaba.cloud.ai</groupId>
-            <artifactId>spring-ai-alibaba-agent-framework</artifactId>
+            <artifactId>spring-ai-alibaba-starter-memory-jdbc</artifactId>
         </dependency>
 
-        <!-- Spring AI OpenAI 集成 -->
+        <!-- Spring AI OpenAI 集成（与 DashScope 共存）：GA line -->
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-model-openai</artifactId>
         </dependency>
 
-    
-
-        <!-- Neo4j Driver (独立依赖，不通过Spring AI) -->
+        <!-- Neo4j Driver -->
         <dependency>
             <groupId>org.neo4j.driver</groupId>
             <artifactId>neo4j-java-driver</artifactId>
@@ -99,7 +102,7 @@
         <dependency>
             <groupId>io.milvus</groupId>
             <artifactId>milvus-sdk-java</artifactId>
-            <version>2.4.0</version>
+            <version>${milvus-sdk.version}</version>
         </dependency>
 
         <!-- MySQL -->
@@ -143,13 +146,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- .env文件支持 -->
-        <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
@@ -164,43 +160,34 @@
         </dependency>
     </dependencies>
 
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-        </repository>
-        <repository>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-            <id>sonatype-snapshots</id>
-            <name>Sonatype Snapshot Repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-        <!-- Central Repository for missing dependencies -->
-        <repository>
-            <id>central</id>
-            <name>Maven Central</name>
-            <url>https://repo1.maven.org/maven2</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <!-- 3) 稳定线：删掉 milestones/snapshots 仓库。
+           Spring AI 1.0.0+ 和 Alibaba 1.0.0.4 都在 Maven Central。 -->
+    <!-- Spring AI 官方文档也说明 1.0.0+ 直接用 Central，无需额外仓库。 -->
+    <!-- :contentReference[oaicite:4]{index=4} -->
 
     <build>
         <plugins>
+            <!-- 4) 强制冻结依赖：禁止 SNAPSHOT/动态版本，并强制依赖收敛 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-no-drift</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireReleaseDeps/>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

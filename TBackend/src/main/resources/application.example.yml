@@ -1,0 +1,81 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: TBackend
+
+  # 数据库配置（按你的环境填写）
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/trag?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=GMT%2B8
+    username: root
+    password: your_password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  neo4j:
+    uri: bolt://127.0.0.1:7687
+    authentication:
+      username: neo4j
+      password: your_password
+
+  # Redis配置
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      password: ""
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  ai:
+    chat:
+      client:
+        enabled: false
+
+    # OpenAI（按你的供应商/网关填写）
+    openai:
+      base-url: https://api.openai.com
+      api-key: your_openai_api_key
+      chat:
+        options:
+          model: gpt-4o-mini
+      embedding:
+        options:
+          model: text-embedding-ada-002
+
+    # DashScope（通义千问）
+    dashscope:
+      api-key: your_dashscope_api_key
+      chat:
+        enabled: true
+        options:
+          model: qwen-flash
+      agent:
+        enabled: false
+
+    # Vector store configuration - using Milvus（RAG 阶段用，本 MVP 可不启用）
+    vectorstore:
+      milvus:
+        host: localhost
+        port: 19530
+        database-name: default
+        collection-name: document_embeddings
+        embedding-dimension: 1536
+        metric-type: COSINE
+        auto-create-collection: true
+
+# MyBatis Plus
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+trag:
+  chat:
+    system-prompt: "你是一个严谨的中文助手。"
+    max-history-turns: 10
+    max-message-length: 2000
+

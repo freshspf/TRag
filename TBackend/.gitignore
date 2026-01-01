@@ -40,3 +40,6 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+
+### Local config (do not commit real secrets) ###
+src/main/resources/application.yml
